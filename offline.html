@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>غير متصل بالإنترنت - دفتر الديون</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .offline-card {
+            background: white;
+            border-radius: 35px;
+            padding: 40px 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .offline-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+
+        .icon-wifi {
+            display: inline-block;
+            position: relative;
+        }
+
+        .wifi-signal {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #e74c3c;
+            position: relative;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        p {
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .features-list {
+            text-align: right;
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .features-list li {
+            list-style: none;
+            padding: 5px 0;
+            color: #2c3e50;
+        }
+
+        .features-list i {
+            color: #27ae60;
+            margin-left: 10px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.4);
+        }
+
+        .retry-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        }
+
+        .offline-actions {
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+        }
+
+        hr {
+            margin: 20px 0;
+            border: none;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .small-note {
+            font-size: 0.75rem;
+            color: #95a5a6;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-card">
+        <div class="offline-icon">
+            📡
+        </div>
+       
+        <h2>⛔ لا يوجد اتصال بالإنترنت</h2>
+       
+        <p>عذراً، لا يمكن الاتصال بالخادم حالياً. ولكن لا تقلق! تطبيق دفتر الديون يعمل بشكل طبيعي دون إنترنت.</p>
+       
+        <div class="features-list">
+            <li><i class="check">✓</i> عرض العملاء والديون المسجلة مسبقاً</li>
+            <li><i class="check">✓</i> إضافة عملاء جدد (سيتم مزامنتهم لاحقاً)</li>
+            <li><i class="check">✓</i> تسجيل ديون وسداد جديدة</li>
+            <li><i class="check">✓</i> جميع البيانات محفوظة محلياً</li>
+        </div>
+       
+        <hr>
+       
+        <div class="offline-actions">
+            <button onclick="goToApp()" class="retry-btn">
+                📱 الذهاب إلى التطبيق
+            </button>
+            <button onclick="location.reload()">
+                🔄 إعادة المحاولة
+            </button>
+        </div>
+       
+        <div class="small-note">
+            💡 عندما يعود الاتصال بالإنترنت، سيتم مزامنة جميع بياناتك تلقائياً مع السحابة.
+        </div>
+    </div>
+
+    <script>
+        // محاولة العودة إلى التطبيق
+        function goToApp() {
+            window.location.href = '/index.html';
+        }
+       
+        // محاولة التحقق من الاتصال تلقائياً كل 5 ثوانٍ
+        let retryInterval = setInterval(() => {
+            if (navigator.onLine) {
+                clearInterval(retryInterval);
+                window.location.href = '/index.html';
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
