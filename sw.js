@@ -1,6 +1,6 @@
 // sw.js - Service Worker لتشغيل التطبيق دون إنترنت
 
-const CACHE_NAME = 'grocery-debt-v1';
+const CACHE_NAME = 'grocery-debt-v2';
 const urlsToCache = [
     '/',
     '/index.html',
