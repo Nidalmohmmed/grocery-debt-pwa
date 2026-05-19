@@ -169,6 +169,8 @@ document.getElementById('saveCustomerBtn').onclick = async () => {
                 notes: document.getElementById('customerNotes').value || '',
                 createdAt: new Date().toISOString()
             });
+            showToast('تم اضافة العميل بنجاح','succes');
+
         }
         bootstrap.Modal.getInstance(document.getElementById('customerModal')).hide();
         await loadCustomers();
@@ -203,8 +205,15 @@ document.getElementById('saveTransactionBtn').onclick = async () => {
 document.getElementById('deleteCustomerBtn').onclick = async () => {
     const customerId = window.currentCustomerId;
     const customer = currentCustomers.find(c => c.id === customerId);
-    if (!confirm(`⚠️ حذف "${customer.name}"؟`)) return;
-   
+    const confirmed = await showConfirm({
+        title: 'حذف العميل',
+        message: `⚠️ هل أنت متأكد من حذف "${customer.name}"؟\nسيتم حذف جميع الديون والسداد المرتبطة به.`,
+        confirmText: 'حذف',
+        cancelText: 'إلغاء',
+        type: 'danger'
+    });
+    
+    if (!confirmed) return;   
     try {
         const transactionsQuery = query(collection(db, 'transactions'), where('customerId', '==', customerId));
         const transactionsSnapshot = await getDocs(transactionsQuery);
@@ -212,6 +221,8 @@ document.getElementById('deleteCustomerBtn').onclick = async () => {
         await deleteDoc(doc(db, 'customers', customerId));
         bootstrap.Modal.getInstance(document.getElementById('detailsModal')).hide();
         await loadCustomers();
+        showToast('تم حذف العميل بنجاح','succes');
+
     } catch (error) { showToast("حدث خطأ",'error'); }
 };
 
@@ -259,7 +270,7 @@ document.getElementById('showStatsBtn').onclick = async () => {
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
         </head><body style="padding:20px"><div class="container">
-        <h2 class="text-center mb-4">📊 إحصائيات ديون البقالة</h2>
+        <h2 class="text-center mb-4">📊 إحصائيات الديون </h2>
         <div class="card mb-4"><div class="card-body"><canvas id="debtChart"></canvas></div></div>
         <div class="card"><div class="card-body">
         <table class="table table-bordered">
@@ -421,7 +432,7 @@ document.getElementById('printCustomerStatementBtn').onclick = async () => {
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>📒 دفتر ديون البقالة</h1>
+                    <h1>📒 دفتر الديون </h1>
                     <p>كشف حساب العميل</p>
                 </div>
                
@@ -463,7 +474,7 @@ document.getElementById('printCustomerStatementBtn').onclick = async () => {
                
                 <div class="footer">
                     <p>هذا كشف حساب تلقائي - يرجى مراجعة البيانات مع الدفتر اليدوي إن وجد</p>
-                    <p>تم الإنشاء بواسطة نظام دفتر ديون البقالة</p>
+                    <p>تم الإنشاء بواسطة نظام دفتر الديون </p>
                 </div>
             </div>
             <script>
@@ -531,7 +542,7 @@ document.getElementById('saveCustomerStatementBtn').onclick = async () => {
     snapshot.forEach(doc => transactions.push(doc.data()));
     transactions.sort((a, b) => new Date(a.date) - new Date(b.date));
    
-    let content = `📒 دفتر ديون البقالة\n`;
+    let content = `📒 دفتر الديون \n`;
     content += `===========================================\n`;
     content += `كشف حساب العميل\n`;
     content += `===========================================\n\n`;
@@ -554,7 +565,7 @@ document.getElementById('saveCustomerStatementBtn').onclick = async () => {
     }
    
     content += `\n===========================================\n`;
-    content += `تم الإنشاء بواسطة نظام دفتر ديون البقالة\n`;
+    content += `تم الإنشاء بواسطة نظام دفتر الديون \n`;
     content += `===========================================\n`;
    
     try {
@@ -626,4 +637,76 @@ function showUpdateToast() {
             toast.classList.remove('show');
         }, 30000);
     }
+}
+// نافذة تأكيد مخصصة (بديلة عن confirm)
+function showConfirm({
+    title = 'تأكيد',
+    message = 'هل أنت متأكد؟',
+    confirmText = 'نعم',
+    cancelText = 'إلغاء',
+    type = 'warning' // warning, danger, info
+}) {
+    return new Promise((resolve) => {
+        // إزالة أي نافذة موجودة
+        const oldModal = document.querySelector('.custom-confirm');
+        if (oldModal) oldModal.remove();
+       
+        // إنشاء النافذة
+        const modal = document.createElement('div');
+        modal.className = 'custom-confirm';
+       
+        // اختيار الأيقونة واللون حسب النوع
+        let icon = '';
+        let color = '';
+        switch (type) {
+            case 'danger':
+                icon = '🗑️';
+                color = '#e74c3c';
+                break;
+            case 'warning':
+                icon = '⚠️';
+                color = '#f39c12';
+                break;
+            case 'info':
+                icon = 'ℹ️';
+                color = '#3498db';
+                break;
+            default:
+                icon = '❓';
+                color = '#667eea';
+        }
+       
+        modal.innerHTML = `
+            <div class="confirm-content">
+                <div style="font-size: 50px; margin-bottom: 10px;">${icon}</div>
+                <h4>${title}</h4>
+                <p>${message}</p>
+                <div class="confirm-buttons">
+                    <button class="confirm-no">${cancelText}</button>
+                    <button class="confirm-yes" style="background: linear-gradient(135deg, ${color}, ${color === '#e74c3c' ? '#c0392b' : color === '#f39c12' ? '#e67e22' : '#5a67d8'})">${confirmText}</button>
+                </div>
+            </div>
+        `;
+       
+        document.body.appendChild(modal);
+       
+        // التعامل مع الأزرار
+        modal.querySelector('.confirm-yes').onclick = () => {
+            modal.remove();
+            resolve(true);
+        };
+       
+        modal.querySelector('.confirm-no').onclick = () => {
+            modal.remove();
+            resolve(false);
+        };
+       
+        // إغلاق عند الضغط خارج النافذة
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.remove();
+                resolve(false);
+            }
+        };
+    });
 }

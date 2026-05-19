@@ -1,7 +1,7 @@
 {
     "name": "دفتر ديون ",
     "short_name": "دفتر الديون",
-    "description": "تطبيق إدارة ديون البقالات   ",
+    "description": "تطبيق إدارة الديون    ",
     "start_url": "/index.html",
     "display": "standalone",
     "theme_color": "#2c3e50",
